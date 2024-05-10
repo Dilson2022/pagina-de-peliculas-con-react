@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 //import movies from "../movies.json";
 import MovieCard from "./MovieCard";
 import styles from "./MoviesGrid.module.css";
-import { useParams } from "react-router-dom";
+import Spinner from "./Spinner";
 import get from "../util/httpClient";
+import useQuery from "../hooks/UseQuery";
+
 
 
 const MoviesGrid = () => {
@@ -12,16 +14,31 @@ const MoviesGrid = () => {
 
   //let movies = [];
   const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const query = useQuery();
+  const search = query.get("search");
+  console.log(search);
   
+
   useEffect(() => {
-   get("/discover/movie")
-   .then((data) => {
-     setMovies(data.results);
+    setLoading(true);
+    const searchUrl = search 
+    ? "/search/movie?query=" + search 
+    : "/discover/movie";
+    get(searchUrl).then((data) => {
+      setLoading(false);
+      setMovies(data.results);
     });
-  }, []);
-     
-  
-  
+  }, [search]);
+
+  if (loading) {
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <ul className={styles.movieGrid}>

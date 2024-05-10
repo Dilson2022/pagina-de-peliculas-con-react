@@ -1,24 +1,39 @@
 import React, { useEffect, useState } from "react";
-
+import Spinner from "../components/Spinner";
 import styles from "./MovieDetail.module.css";
 import { useParams } from "react-router-dom";
 import get from "../util/httpClient";
 
 
+
 const MovieDetail = () => {
   const {movieId}= useParams();
+  const [loading, setLoading] = useState(true);
   const [movie, setMovie] =useState(null)
  
+  
+
   useEffect(()=> {
+    setLoading(true);
     get("/movie/" + movieId) 
     .then(data => {
+      setLoading(false)
       setMovie(data)
     });
   },[movieId]);
 
-  if (!movie) {
-    return null;
+  if (loading) {
+    return (
+      <div>
+        <Spinner/>
+      </div>
+    )
   }
+
+  // if (!movie) {
+  //   return null;
+  // }
+
   const imageUrl = "https://image.tmdb.org/t/p/w500" + movie.poster_path;
   return (
     <div className={styles.detailConteiner}>
